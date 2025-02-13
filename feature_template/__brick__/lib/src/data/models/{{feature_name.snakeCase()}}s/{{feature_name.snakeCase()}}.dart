@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part '../../../../../../../../feature_template/__brick__/lib/src/data/models/{{feature_name.snakeCase()}}s/{{feature_name.snakeCase()}}.freezed.dart';
-part '../../../../../../../../feature_template/__brick__/lib/src/data/models/{{feature_name.snakeCase()}}s/{{feature_name.snakeCase()}}.g.dart';
+part '{{feature_name.snakeCase()}}.freezed.dart';
+part '{{feature_name.snakeCase()}}.g.dart';
 
 @freezed
 class {{feature_name.pascalCase()}} with _${{feature_name.pascalCase()}} {
