@@ -24,7 +24,7 @@ void main() {
   });
 
   group('{{feature_name.sentenceCase()}} Screen', () {
-    testWidgets('--> Check Build Structure', (WidgetTester tester) async {
+    testWidgets('--> Check Build Structures', (WidgetTester tester) async {
       GlobalBindingMock.initialize();
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;
