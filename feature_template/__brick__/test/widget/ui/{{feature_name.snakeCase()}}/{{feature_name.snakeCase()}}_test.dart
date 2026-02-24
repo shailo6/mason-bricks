@@ -4,13 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fusiongoapp/src/business_logic/cubits.dart';
 import 'package:fusiongoapp/src/ui/screens/{{feature_name.snakeCase()}}/{{feature_name.snakeCase()}}_home.dart';
+import '../../widget_test_app_config.dart';
 import '../../common_setup/mock_classes.dart';
 import '../../dependency_injection_mock.dart';
-import '../../widget_test_app_config.dart';
-import 'package:mocktail/mocktail.dart';
 
 
-class Mock{{feature_name.pascalCase()}}Repository extends Mock implements {{feature_name.pascalCase()}}Repository {}
+
 void main() {
   late Widget {{feature_name.camelCase()}}Screen;
 
@@ -24,7 +23,7 @@ void main() {
   });
 
   group('{{feature_name.sentenceCase()}} Screen', () {
-    testWidgets('--> Check Build Structures', (WidgetTester tester) async {
+    testWidgets('--> Check Build Structure', (WidgetTester tester) async {
       GlobalBindingMock.initialize();
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;

@@ -2,11 +2,12 @@ import 'dart:io';
 
 import 'package:mason/mason.dart';
 
-void run(HookContext context) async {
+void run(HookContext context) {
   context.logger.info('✅ Post-gen hook is running...');
 
   final featureName = context.vars['feature_name'] as String;
-  final featureSnakeCase = featureName.toLowerCase();
+  final featureSnakeCase = _toSnakeCase(featureName);
+  final featurePascalCase = _toPascalCase(featureName);
 
   final updates = {
     'lib/src/data/repositories/repositories.dart':
@@ -38,39 +39,45 @@ void run(HookContext context) async {
     }
   }
 
-  // Run the Flutter build_runner command
-  try {
-    final buildRunnerResult = await Process.run(
-      'flutter',
-      ['pub', 'run', 'build_runner', 'build', '--delete-conflicting-outputs'],
-      workingDirectory: Directory.current.path,
-    );
+  // Add mock class to mock_classes.dart
+  final mockClassesPath = 'test/widget/common_setup/mock_classes.dart';
+  final mockClassesFile = File(mockClassesPath);
 
-    if (buildRunnerResult.exitCode == 0) {
-      context.logger.success('✅ build_runner ran successfully.');
+  if (mockClassesFile.existsSync()) {
+    final mockClassName = 'Mock${featurePascalCase}Repository';
+    final mockClassContent =
+        'class $mockClassName extends Mock implements ${featurePascalCase}Repository {}';
+    final currentContent = mockClassesFile.readAsStringSync();
+
+    if (!currentContent.contains(mockClassName)) {
+      mockClassesFile.writeAsStringSync('$currentContent\n$mockClassContent\n');
+      context.logger.info('✅ Added $mockClassName to $mockClassesPath.');
     } else {
-      context.logger.err('❌ build_runner failed: ${buildRunnerResult.stderr}');
+      context.logger.info(
+          '⚠️ $mockClassName already exists in $mockClassesPath, skipping.');
     }
-  } catch (e) {
-    context.logger.err('❌ Error running build_runner: $e');
-  }
-
-  // Run the Dart format command
-  try {
-    final formatResult = await Process.run(
-      'dart',
-      ['format', '.'],
-      workingDirectory: Directory.current.path,
-    );
-
-    if (formatResult.exitCode == 0) {
-      context.logger.success('✅ Dart format ran successfully.');
-    } else {
-      context.logger.err('❌ Dart format failed: ${formatResult.stderr}');
-    }
-  } catch (e) {
-    context.logger.err('❌ Error running dart format: $e');
+  } else {
+    context.logger
+        .warn('❌ $mockClassesPath not found, skipping mock class update.');
   }
 
   context.logger.success('🎉 Post-gen hook finished.');
+}
+
+/// Convert PascalCase to snake_case
+String _toSnakeCase(String str) {
+  return str
+      .replaceAllMapped(RegExp(r'([a-z])([A-Z])'),
+          (match) => '${match.group(1)}_${match.group(2)}')
+      .toLowerCase();
+}
+
+/// Convert any case to PascalCase
+String _toPascalCase(String str) {
+  return str
+      .split(RegExp(r'[_\-\s]+|(?<=[a-z])(?=[A-Z])'))
+      .map((word) => word.isEmpty
+          ? ''
+          : word[0].toUpperCase() + word.substring(1).toLowerCase())
+      .join();
 }
